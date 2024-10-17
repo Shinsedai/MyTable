@@ -1,20 +1,41 @@
-#ifndef BTREE_H
-#define BTREE_H
+#include <stdio.h>
+#include <stdlib.h>
+#include "btree.h"
 
-typedef struct {
-    int id;
-    char name[32];
-    char email[256];
-} Row;
+Node* create_node(Row* data) {
+    Node* node = (Node*)malloc(sizeof(Node));
+    node->data = data;
+    node->left = NULL;
+    node->right = NULL;
+    return node;
+}
 
-typedef struct Node {
-    Row* data;
-    struct Node* left;
-    struct Node* right;
-} Node;
+Node* insert(Node* root, Row* data) {
+    if (root == NULL) {
+        return create_node(data);
+    }
+    if (data->id < root->data->id) {
+        root->left = insert(root->left, data);
+    } else if (data->id > root->data->id) {
+        root->right = insert(root->right, data);
+    }
+    return root;
+}
 
-Node* insert(Node* root, Row* data);
-Row* search(Node* root, int id);
-void free_tree(Node* root);
+Row* search(Node* root, int id) {
+    if (root == NULL || root->data->id == id) {
+        return (root != NULL) ? root->data : NULL;
+    }
+    if (id < root->data->id) {
+        return search(root->left, id);
+    } else {
+        return search(root->right, id);
+    }
+}
 
-#endif
+void free_tree(Node* root) {
+    if (root == NULL) return;
+    free_tree(root->left);
+    free_tree(root->right);
+    free(root);
+}
