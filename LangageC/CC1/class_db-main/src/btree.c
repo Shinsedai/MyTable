@@ -36,6 +36,44 @@ Row* search(Node* root, int id) {
     }
 }
 
+// Function to find the minimum value node
+Node* minValueNode(Node* node) {
+    Node* current = node;
+    while (current && current->left != NULL)
+        current = current->left;
+
+    return current;
+}
+
+Node* delete(Node* root, int id) {
+    if (root == NULL) return root;
+
+    if (id < root->data->id) {
+        root->left = delete(root->left, id);
+    } else if (id > root->data->id) {
+        root->right = delete(root->right, id);
+    } else {
+        if (root->left == NULL) {
+            Node* temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        Node* temp = minValueNode(root->right);
+
+        root->data = temp->data;
+
+        root->right = delete(root->right, temp->data->id);
+    }
+    return root;
+}
+
+
+
 // Frees all memory allocated for the binary search tree
 void free_tree(Node* root) {
     if (root == NULL) return;                 // If the tree is empty, do nothing
