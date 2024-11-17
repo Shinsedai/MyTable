@@ -26,6 +26,7 @@ typedef enum {
 typedef struct {
     StatementType type;
     Row row_to_insert; // Data for the "INSERT" statement
+    Row row_to_select; // Data for the "SELECT" statement
 } Statement;
 
 // Input buffer for storing user input
@@ -73,6 +74,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
         }
         ptr[len++] = c;
     }
+    ptr[len] = '\0';
 
     if (c == EOF && len == 0) return -1; // End of input
     ptr[len] = '\0';
@@ -80,17 +82,23 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
 }
 
 // Reads input into the input buffer
+// Adjust read_input function to correctly handle the newline character
 void read_input(InputBuffer* input_buffer) {
     ssize_t bytes_read = getline(&(input_buffer->buffer), &(input_buffer->buffer_length), stdin);
-
     if (bytes_read <= 0) {
         printf("Error reading input\n");
         exit(EXIT_FAILURE);
     }
 
-    input_buffer->input_length = bytes_read - 1;
-    input_buffer->buffer[bytes_read - 1] = '\0';
+    // Check if the last character is a newline before adjusting
+    if (input_buffer->buffer[bytes_read - 1] == '\n') {
+        input_buffer->input_length = bytes_read - 1;
+        input_buffer->buffer[bytes_read - 1] = '\0';
+    } else {
+        input_buffer->input_length = bytes_read;
+    }
 }
+
 
 // Prints a single row in a formatted manner
 void print_row(Row* row) {
@@ -142,8 +150,15 @@ PrepareResult prepare_statement(InputBuffer* input_buffer, Statement* statement)
         return prepare_insert(input_buffer, statement);
     }
 
-    if (strcmp(input_buffer->buffer, "select") == 0) {
+    if (strncmp(input_buffer->buffer, "select", 6) == 0) {
         statement->type = STATEMENT_SELECT;
+        int id;
+        int args_assigned = sscanf(input_buffer->buffer, "select %d", &id);
+        if (args_assigned == 1) {
+            statement->row_to_select.id = id;
+        } else {
+            statement->row_to_select.id = -1; // Use -1 to indicate selecting all rows
+        }
         return PREPARE_SUCCESS;
     }
 
@@ -160,10 +175,17 @@ void execute_insert(Statement* statement) {
 
 // Executes a "SELECT" statement
 void execute_select(Statement* statement) {
-    printf("Select all rows:\n");
-    traverse_tree(tree);  // Traverse the tree and print all rows
+    if (statement->row_to_select.id == -1) {
+        traverse_tree(tree); // Print all rows
+    } else {
+        Row* row = search(tree, statement->row_to_select.id);
+        if (row != NULL) {
+            print_row(row);
+        } else {
+            printf("Row with ID %d not found.\n", statement->row_to_select.id);
+        }
+    }
 }
-
 // Executes the prepared statement
 void execute_statement(Statement* statement) {
     switch (statement->type) {
