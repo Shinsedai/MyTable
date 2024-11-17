@@ -15,7 +15,8 @@ L'interface REPL permet une interaction dynamique avec l'utilisateur pour effect
 ## Fonctionnalités
 1. **Insertion** : Permet d'insérer un nouvel élément (id, nom, email) dans le B-Tree.
 2. **Recherche** : Recherche un élément dans le B-Tree par identifiant.
-3. **REPL** : Interface interactive pour entrer des commandes comme `.exit` pour quitter ou `insert` pour ajouter des éléments.
+3. **Suppression** : Supprime un élément du B-Tree par identifiant.
+4. **REPL** : Interface interactive pour entrer des commandes comme `.exit` pour quitter ou `insert` pour ajouter des éléments.
 
 ## Utilisation
 Pour compiler et exécuter le programme, utilisez les commandes suivantes :
@@ -35,11 +36,15 @@ Le projet a été compilé avec GCC version **11.0 w64**.
 Une fois le programme lancé, vous pouvez utiliser les commandes suivantes :
 - **insert <id> <nom> <email>** : Insère un nouvel enregistrement dans le B-Tree.
 - **select <id>** : Recherche et affiche un enregistrement par identifiant.
+- **select** : Affiche tous les enregistrements.
+- **delete <id>** : Supprime un enregistrement par identifiant.
 - **.exit** : Quitte le programme.
 
 ### Exemples
 - `insert 1 "Jean" "jean@example.com"` : Ajoute un enregistrement avec l'id 1, le nom "Jean" et l'email "jean@example.com".
 - `select 1` : Affiche l'enregistrement avec l'id 1.
+- `select` : Affiche tous les enregistrements
+- `delete 1` : Supprime l'enregistrement avec l'id 1.
 - `.exit` : Quitte l'application.
 
 ## Notes de Conception
