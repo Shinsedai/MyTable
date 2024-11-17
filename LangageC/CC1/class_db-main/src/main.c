@@ -4,10 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-
-int main(int argc, char* argv[], char* envp[]){
-  
-  repl();
-  return 0;
-  
+// Entry point of the program
+int main(int argc, char* argv[], char* envp[]) {
+    repl();                // Start the REPL (Read-Eval-Print Loop)
+    return 0;              // Exit the program
 }
